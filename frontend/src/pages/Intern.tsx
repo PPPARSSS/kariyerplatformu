@@ -22,7 +22,8 @@ import {
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
-const API_URL = "http://localhost:3000/api";
+import API_BASE_URL from "@/config/api";
+const API_URL = API_BASE_URL;
 
 export default function InternPage() {
   const { user, roles, isAtLeast } = useAuth();
@@ -298,10 +299,14 @@ export default function InternPage() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Stajyer Portalı</h1>
-            <p className="mt-1 text-muted-foreground">Staj programları, değerlendirmeler ve prosedürler (Backend Bağlantılı Server Versiyonu)</p>
+        <div className="relative overflow-hidden rounded-2xl bg-card border shadow-sm">
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent z-10" />
+          <img src="/hero-bg.png" alt="Hero Background" className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay" />
+          <div className="relative z-20 p-8 md:p-12">
+            <h1 className="text-3xl font-extrabold text-foreground md:text-4xl tracking-tight">Stajyer Portalı</h1>
+            <p className="mt-2 text-lg text-muted-foreground max-w-2xl font-medium">
+              Staj programları, değerlendirmeler ve şirket prosedürlerini modern, veriye dayalı ve estetik bir arayüzde yönetin.
+            </p>
           </div>
         </div>
 

@@ -26,6 +26,7 @@ import CareerMap from "./pages/CareerMap";
 import CareerPathEditor from "./pages/CareerPathEditor";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
+import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
             <Route path="/hr-analytics" element={<ProtectedRoute requiredRole="yonetici"><HrAnalytics /></ProtectedRoute>} />
             <Route path="/career-path-editor" element={<ProtectedRoute requiredRole="yonetici"><CareerPathEditor /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute requiredRole="ust_yonetici"><AdminUsers /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import API_BASE_URL from '@/config/api';
 
 type AppRole = 'stajyer' | 'personel' | 'takim_lideri' | 'yonetici' | 'ust_yonetici' | 'ik';
 
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/users/${userId}/profile`);
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`);
       if (res.ok) {
         const data = await res.json();
         setProfile(data);
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchRoles = async (userId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/users/${userId}/roles`);
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/roles`);
       if (res.ok) {
         const data = await res.json();
         setRoles(data?.map((r: any) => r.role as AppRole) || []);

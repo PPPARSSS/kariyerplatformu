@@ -29,6 +29,26 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async getAllUsersWithRoles(req, res) {
+        try {
+            const users = await userService.getAllUsersWithRoles();
+            res.status(200).json(users);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async updateUserRoles(req, res) {
+        try {
+            const { id } = req.params;
+            const { roles } = req.body;
+            const result = await userService.updateRoles(id, roles);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = new UserController();

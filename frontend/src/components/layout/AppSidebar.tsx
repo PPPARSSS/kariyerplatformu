@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { screenPermissions, type AppRole } from "@/config/permissions";
 import {
   LayoutDashboard,
   BookOpen,
@@ -26,6 +27,7 @@ import {
   UserCheck,
   Rocket,
   Building2,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -34,41 +36,43 @@ interface NavItem {
   icon: React.ElementType;
   href: string;
   badge?: number;
+  requiredRole?: AppRole;
 }
 
 const mainNavItems: NavItem[] = [
-  { title: "Dashboard", icon: LayoutDashboard, href: "/" },
-  { title: "Akademi", icon: BookOpen, href: "/catalog" },
-  { title: "Kariyer Merkezi", icon: TrendingUp, href: "/progress" },
-  { title: "Kariyer Haritası", icon: Award, href: "/career-map" },
-  { title: "Yetkinlik Ağacım", icon: Target, href: "/skill-tree" },
-  { title: "Organizasyon", icon: Building2, href: "/organization" },
-  { title: "İngilizce Geliştirme", icon: Globe, href: "/english" },
+  { title: "Dashboard", icon: LayoutDashboard, href: "/", requiredRole: "stajyer" },
+  { title: "Akademi", icon: BookOpen, href: "/catalog", requiredRole: "stajyer" },
+  { title: "Kariyer Merkezi", icon: TrendingUp, href: "/progress", requiredRole: "stajyer" },
+  { title: "Kariyer Haritası", icon: Award, href: "/career-map", requiredRole: "personel" },
+  { title: "Yetkinlik Ağacım", icon: Target, href: "/skill-tree", requiredRole: "stajyer" },
+  { title: "Organizasyon", icon: Building2, href: "/organization", requiredRole: "takim_lideri" },
+  { title: "İngilizce Geliştirme", icon: Globe, href: "/english", requiredRole: "stajyer" },
 ];
 
 const developmentNavItems: NavItem[] = [
-  { title: "Liderlik Gelişimi", icon: Award, href: "/leadership" },
-  { title: "Soft Skills", icon: UserCheck, href: "/soft-skills" },
-  { title: "Stajyer Portalı", icon: FolderOpen, href: "/intern" },
-  { title: "Kurum Eğitimleri", icon: Briefcase, href: "/corporate" },
-  { title: "Onboarding", icon: Rocket, href: "/onboarding" },
+  { title: "Liderlik Gelişimi", icon: Award, href: "/leadership", requiredRole: "personel" },
+  { title: "Soft Skills", icon: UserCheck, href: "/soft-skills", requiredRole: "stajyer" },
+  { title: "Stajyer Portalı", icon: FolderOpen, href: "/intern", requiredRole: "stajyer" },
+  { title: "Kurum Eğitimleri", icon: Briefcase, href: "/corporate", requiredRole: "personel" },
+  { title: "Onboarding", icon: Rocket, href: "/onboarding", requiredRole: "stajyer" },
 ];
 
 const socialNavItems: NavItem[] = [
-  { title: "Topluluk & Forum", icon: MessageSquare, href: "/community" },
-  { title: "Yarışmalar", icon: Trophy, href: "/competitions" },
-  { title: "Takım Arkadaşları", icon: Users, href: "/teammates" },
+  { title: "Topluluk & Forum", icon: MessageSquare, href: "/community", requiredRole: "stajyer" },
+  { title: "Yarışmalar", icon: Trophy, href: "/competitions", requiredRole: "stajyer" },
+  { title: "Takım Arkadaşları", icon: Users, href: "/teammates", requiredRole: "personel" },
 ];
 
 const mediaNavItems: NavItem[] = [
-  { title: "Film Önerileri", icon: Film, href: "/films" },
-  { title: "Haberler", icon: Newspaper, href: "/news" },
-  { title: "Makaleler", icon: FileText, href: "/articles" },
+  { title: "Film Önerileri", icon: Film, href: "/films", requiredRole: "stajyer" },
+  { title: "Haberler", icon: Newspaper, href: "/news", requiredRole: "stajyer" },
+  { title: "Makaleler", icon: FileText, href: "/articles", requiredRole: "stajyer" },
 ];
 
 const managementNavItems: NavItem[] = [
-  { title: "İK & Analitik", icon: BarChart3, href: "/hr-analytics" },
-  { title: "Kariyer Yolu Editörü", icon: Target, href: "/career-path-editor" },
+  { title: "İK & Analitik", icon: BarChart3, href: "/hr-analytics", requiredRole: "yonetici" },
+  { title: "Kariyer Yolu Editörü", icon: Target, href: "/career-path-editor", requiredRole: "yonetici" },
+  { title: "Kullanıcı Yönetimi", icon: Shield, href: "/admin/users", requiredRole: "ust_yonetici" },
 ];
 
 export function AppSidebar() {
@@ -82,43 +86,46 @@ export function AppSidebar() {
     navigate("/auth");
   };
 
-  // Filter management items based on role
-  const visibleManagementItems = managementNavItems.filter(() => 
-    isAtLeast('yonetici') || hasRole('ik')
-  );
+  // Filter nav items based on user role
+  const filterByRole = (items: NavItem[]) =>
+    items.filter((item) => !item.requiredRole || isAtLeast(item.requiredRole));
 
-  const NavSection = ({ items, title }: { items: NavItem[]; title?: string }) => (
-    <div className="space-y-1">
-      {title && !collapsed && (
-        <p className="px-3 py-2 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/50">
-          {title}
-        </p>
-      )}
-      {items.map((item) => (
-        <NavLink
-          key={item.href}
-          to={item.href}
-          className={({ isActive }) =>
-            cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              isActive
-                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                : "text-sidebar-foreground"
-            )
-          }
-        >
-          <item.icon className={cn("h-5 w-5 shrink-0", collapsed && "mx-auto")} />
-          {!collapsed && <span>{item.title}</span>}
-          {!collapsed && item.badge && (
-            <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-warning-foreground">
-              {item.badge}
-            </span>
-          )}
-        </NavLink>
-      ))}
-    </div>
-  );
+  const NavSection = ({ items, title }: { items: NavItem[]; title?: string }) => {
+    const filtered = filterByRole(items);
+    if (filtered.length === 0) return null;
+    return (
+      <div className="space-y-1">
+        {title && !collapsed && (
+          <p className="px-3 py-2 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/50">
+            {title}
+          </p>
+        )}
+        {filtered.map((item) => (
+          <NavLink
+            key={item.href}
+            to={item.href}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isActive
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                  : "text-sidebar-foreground"
+              )
+            }
+          >
+            <item.icon className={cn("h-5 w-5 shrink-0", collapsed && "mx-auto")} />
+            {!collapsed && <span>{item.title}</span>}
+            {!collapsed && item.badge && (
+              <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-warning-foreground">
+                {item.badge}
+              </span>
+            )}
+          </NavLink>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <aside
@@ -131,15 +138,15 @@ export function AppSidebar() {
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-              <GraduationCap className="h-5 w-5 text-sidebar-primary-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary overflow-hidden">
+              <img src="/infina-logo.png" alt="İnfina" className="h-6 w-6 object-contain" />
             </div>
-            <span className="text-lg font-bold text-sidebar-foreground">İnfina Gelişim</span>
+            <span className="text-lg font-bold text-sidebar-foreground">İnfina Core</span>
           </div>
         )}
         {collapsed && (
-          <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-            <GraduationCap className="h-5 w-5 text-sidebar-primary-foreground" />
+          <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary overflow-hidden">
+            <img src="/infina-logo.png" alt="İnfina" className="h-6 w-6 object-contain" />
           </div>
         )}
         <Button
@@ -162,9 +169,7 @@ export function AppSidebar() {
           <NavSection items={developmentNavItems} title="Gelişim" />
           <NavSection items={socialNavItems} title="Topluluk" />
           <NavSection items={mediaNavItems} title="Medya" />
-          {visibleManagementItems.length > 0 && (
-            <NavSection items={visibleManagementItems} title="Yönetim" />
-          )}
+          <NavSection items={managementNavItems} title="Yönetim" />
         </div>
       </nav>
 

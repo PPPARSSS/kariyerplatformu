@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const API_URL = "http://localhost:3000/api";
+import API_BASE_URL from "@/config/api";
+const API_URL = API_BASE_URL;
 
 // --- Types ---
 interface CareerNode {
@@ -543,19 +544,23 @@ export default function CareerPathEditorPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Kariyer Yolu Editörü</h1>
-            <p className="mt-1 text-muted-foreground">
-              Çalışanların kariyer ağacını oluşturun, düzenleyin ve önceliklendirin
-            </p>
+        <div className="relative overflow-hidden rounded-2xl bg-card border shadow-sm">
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent z-10" />
+          <img src="/career-cover.png" alt="Career Path Editor" className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay" />
+          <div className="relative z-20 p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl font-extrabold text-foreground md:text-4xl tracking-tight">Kariyer Yolu Editörü</h1>
+              <p className="mt-2 text-lg text-muted-foreground max-w-2xl font-medium">
+                Çalışanların kariyer ağacını oluşturun, düzenleyin ve profesyonel gelişim adımlarını planlayın.
+              </p>
+            </div>
+            {canEdit && (
+              <Button size="lg" className="shadow-xl bg-primary hover:bg-primary/90 text-white" onClick={() => setShowNewPath(true)}>
+                <Plus className="h-5 w-5 mr-2" />
+                Yeni Kariyer Yolu
+              </Button>
+            )}
           </div>
-          {canEdit && (
-            <Button onClick={() => setShowNewPath(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Yeni Kariyer Yolu
-            </Button>
-          )}
         </div>
 
         {/* New Path Dialog */}
