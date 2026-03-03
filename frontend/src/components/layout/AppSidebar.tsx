@@ -70,6 +70,7 @@ const mediaNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
+  { title: "Ekibim", icon: Users, href: "/manage-team", requiredRole: "takim_lideri" },
   { title: "İK & Analitik", icon: BarChart3, href: "/hr-analytics", requiredRole: "yonetici" },
   { title: "Kariyer Yolu Editörü", icon: Target, href: "/career-path-editor", requiredRole: "yonetici" },
   { title: "Kullanıcı Yönetimi", icon: Shield, href: "/admin/users", requiredRole: "ust_yonetici" },

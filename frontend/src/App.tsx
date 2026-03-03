@@ -28,6 +28,7 @@ import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
+import ManageTeam from "./pages/ManageTeam";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/films" element={<ProtectedRoute><Films /></ProtectedRoute>} />
             <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
             <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+            <Route path="/manage-team" element={<ProtectedRoute requiredRole="takim_lideri"><ManageTeam /></ProtectedRoute>} />
             <Route path="/hr-analytics" element={<ProtectedRoute requiredRole="yonetici"><HrAnalytics /></ProtectedRoute>} />
             <Route path="/career-path-editor" element={<ProtectedRoute requiredRole="yonetici"><CareerPathEditor /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requiredRole="ust_yonetici"><AdminUsers /></ProtectedRoute>} />

@@ -15,10 +15,15 @@ const internRoutes = require('./src/routes/intern.routes');
 const careerRoutes = require('./src/routes/career.routes');
 const procedureRoutes = require('./src/routes/procedure.routes');
 const userRoutes = require('./src/routes/user.routes');
+const teamRoutes = require('./src/routes/team.routes');
+const competencyRoutes = require('./src/routes/competency.routes');
 
 app.use('/api/interns', internRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/procedures', procedureRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/teams', teamRoutes);
+app.use('/api/competencies', competencyRoutes);
 
 module.exports = app;
+
