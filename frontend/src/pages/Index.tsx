@@ -6,6 +6,7 @@ import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { UpcomingTasks } from "@/components/dashboard/UpcomingTasks";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { WeeklyFilm } from "@/components/dashboard/WeeklyFilm";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,6 +61,9 @@ const featuredCourses = [
 ];
 
 const Index = () => {
+  const { profile } = useAuth();
+  const firstName = profile?.full_name?.split(' ')[0] || 'Kullanıcı';
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -87,7 +91,7 @@ const Index = () => {
                 <span>Harika gidiyorsun!</span>
               </div>
               <h1 className="text-3xl font-extrabold text-foreground md:text-5xl tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-700">
-                Hoş Geldin, Ahmet! 👋
+                Hoş Geldin, {firstName}! 👋
               </h1>
               <p className="mt-3 text-lg font-medium text-muted-foreground animate-in fade-in slide-in-from-bottom-6 duration-1000">
                 Bugün öğrenmeye devam edelim. Bu hafta tam <strong>3 eğitim</strong> tamamladın! Hedeflerine bir adım daha yaklaştın.
