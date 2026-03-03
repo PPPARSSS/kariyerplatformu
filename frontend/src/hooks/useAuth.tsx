@@ -40,20 +40,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    setProfile(data);
+    try {
+      const res = await fetch(`http://localhost:3000/api/users/${userId}/profile`);
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const fetchRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId);
-    setRoles(data?.map((r) => r.role as AppRole) || []);
+    try {
+      const res = await fetch(`http://localhost:3000/api/users/${userId}/roles`);
+      if (res.ok) {
+        const data = await res.json();
+        setRoles(data?.map((r: any) => r.role as AppRole) || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {

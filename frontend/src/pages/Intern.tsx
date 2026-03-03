@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -23,6 +22,8 @@ import {
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
+const API_URL = "http://localhost:3000/api";
+
 export default function InternPage() {
   const { user, roles, isAtLeast } = useAuth();
   const queryClient = useQueryClient();
@@ -32,63 +33,63 @@ export default function InternPage() {
   const { data: programs = [] } = useQuery({
     queryKey: ["intern-programs"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("intern_programs").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/interns/programs`);
+      if (!res.ok) throw new Error("Failed to fetch programs");
+      return res.json();
     },
   });
 
   const { data: lessons = [] } = useQuery({
     queryKey: ["intern-lessons"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("intern_lessons").select("*").order("order_index");
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/interns/lessons`);
+      if (!res.ok) throw new Error("Failed to fetch lessons");
+      return res.json();
     },
   });
 
   const { data: evaluations = [] } = useQuery({
     queryKey: ["intern-evaluations"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("intern_evaluations").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/interns/evaluations`);
+      if (!res.ok) throw new Error("Failed to fetch evaluations");
+      return res.json();
     },
   });
 
   const { data: evalParams = [] } = useQuery({
     queryKey: ["evaluation-parameters"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("evaluation_parameters").select("*").order("created_at");
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/interns/evaluation-parameters`);
+      if (!res.ok) throw new Error("Failed to fetch parameters");
+      return res.json();
     },
   });
 
   const { data: procedures = [] } = useQuery({
     queryKey: ["procedures"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("procedures").select("*").order("category");
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/procedures`);
+      if (!res.ok) throw new Error("Failed to fetch procedures");
+      return res.json();
     },
   });
 
   const { data: assignments = [] } = useQuery({
     queryKey: ["intern-assignments"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("intern_program_assignments").select("*");
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/interns/assignments`);
+      if (!res.ok) throw new Error("Failed to fetch assignments");
+      return res.json();
     },
   });
 
   const { data: allProfiles = [] } = useQuery({
     queryKey: ["all-profiles-intern"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, user_id, full_name, department, position");
-      if (error) throw error;
-      return data || [];
+      const res = await fetch(`${API_URL}/users/profiles`);
+      if (!res.ok) throw new Error("Failed to fetch profiles");
+      return res.json();
     },
     enabled: isManager,
   });
@@ -120,8 +121,13 @@ export default function InternPage() {
   // === Mutations ===
   const addProgram = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("intern_programs").insert({ ...programForm, created_by: user!.id });
-      if (error) throw error;
+      const res = await fetch(`${API_URL}/interns/programs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...programForm, created_by: user!.id })
+      });
+      if (!res.ok) throw new Error("Program eklenemedi");
+      return res.json();
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["intern-programs"] }); setShowProgramDialog(false); setProgramForm({ title: "", description: "", start_date: "", end_date: "" }); toast.success("Program eklendi"); },
     onError: (e: any) => toast.error(e.message),
@@ -129,8 +135,13 @@ export default function InternPage() {
 
   const addLesson = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("intern_lessons").insert({ ...lessonForm, order_index: Number(lessonForm.order_index), created_by: user!.id });
-      if (error) throw error;
+      const res = await fetch(`${API_URL}/interns/lessons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...lessonForm, order_index: Number(lessonForm.order_index), created_by: user!.id })
+      });
+      if (!res.ok) throw new Error("Ders eklenemedi");
+      return res.json();
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["intern-lessons"] }); setShowLessonDialog(false); setLessonForm({ title: "", content: "", lesson_type: "ders", program_id: "", order_index: 0 }); toast.success("Ders eklendi"); },
     onError: (e: any) => toast.error(e.message),
@@ -149,8 +160,13 @@ export default function InternPage() {
         evaluated_by: user!.id,
       };
       if (evalForm.parameter_id) payload.parameter_id = evalForm.parameter_id;
-      const { error } = await supabase.from("intern_evaluations").insert(payload);
-      if (error) throw error;
+      const res = await fetch(`${API_URL}/interns/evaluations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Değerlendirme eklenemedi");
+      return res.json();
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["intern-evaluations"] }); setShowEvalDialog(false); setEvalForm({ title: "", evaluation_type: "custom", score: "", max_score: "100", notes: "", intern_user_id: "", program_id: "", parameter_id: "" }); toast.success("Değerlendirme eklendi"); },
     onError: (e: any) => toast.error(e.message),
@@ -158,8 +174,14 @@ export default function InternPage() {
 
   const addParam = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("evaluation_parameters").insert({ name: paramForm.name, weight: Number(paramForm.weight), max_score: Number(paramForm.max_score), program_id: paramForm.program_id, created_by: user!.id });
-      if (error) throw error;
+      const payload = { name: paramForm.name, weight: Number(paramForm.weight), max_score: Number(paramForm.max_score), program_id: paramForm.program_id, created_by: user!.id };
+      const res = await fetch(`${API_URL}/interns/evaluation-parameters`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Parametre eklenemedi");
+      return res.json();
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["evaluation-parameters"] }); setShowParamDialog(false); setParamForm({ name: "", weight: "1", max_score: "100", program_id: "" }); toast.success("Parametre eklendi"); },
     onError: (e: any) => toast.error(e.message),
@@ -167,16 +189,27 @@ export default function InternPage() {
 
   const addProcedure = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("procedures").insert({ ...procedureForm, created_by: user!.id });
-      if (error) throw error;
+      const res = await fetch(`${API_URL}/procedures`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...procedureForm, created_by: user!.id })
+      });
+      if (!res.ok) throw new Error("Prosedür eklenemedi");
+      return res.json();
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["procedures"] }); setShowProcedureDialog(false); setProcedureForm({ title: "", content: "", category: "" }); toast.success("Prosedür eklendi"); },
     onError: (e: any) => toast.error(e.message),
   });
 
   const deleteItem = async (table: string, id: string, queryKey: string) => {
-    const { error } = await (supabase.from as any)(table).delete().eq("id", id);
-    if (error) { toast.error(error.message); return; }
+    let endpoint = "";
+    if (table === "procedures") endpoint = `${API_URL}/procedures/${id}`;
+    else endpoint = `${API_URL}/interns/${table}/${id}`;
+
+    const res = await fetch(endpoint, { method: 'DELETE' });
+    if (!res.ok) {
+      toast.error("Silme işlemi başarısız"); return;
+    }
     queryClient.invalidateQueries({ queryKey: [queryKey] });
     toast.success("Silindi");
   };
@@ -268,7 +301,7 @@ export default function InternPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground md:text-3xl">Stajyer Portalı</h1>
-            <p className="mt-1 text-muted-foreground">Staj programları, değerlendirmeler ve prosedürler</p>
+            <p className="mt-1 text-muted-foreground">Staj programları, değerlendirmeler ve prosedürler (Backend Bağlantılı Server Versiyonu)</p>
           </div>
         </div>
 

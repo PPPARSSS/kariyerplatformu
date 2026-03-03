@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
   Plus, Trash2, Save, GripVertical, BookOpen, Code, Award,
@@ -18,6 +17,8 @@ import {
   Edit3, ArrowRight, FileText, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const API_URL = "http://localhost:3000/api";
 
 // --- Types ---
 interface CareerNode {
@@ -382,21 +383,40 @@ export default function CareerPathEditorPage() {
 
   // Fetch paths
   const fetchPaths = useCallback(async () => {
-    const { data } = await supabase.from("career_paths").select("*").order("created_at", { ascending: false });
-    if (data) setPaths(data as any);
-    setLoading(false);
-  }, []);
+    try {
+      const res = await fetch(`${API_URL}/careers/paths`);
+      if (!res.ok) throw new Error("Failed to fetch paths");
+      const data = await res.json();
+      setPaths(data);
+    } catch (e) {
+      toast({ title: "Hata", description: "Kariyer yolları yüklenemedi", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
   // Fetch nodes for selected path
   const fetchNodes = useCallback(async (pathId: string) => {
-    const { data } = await supabase.from("career_nodes").select("*").eq("career_path_id", pathId).order("priority");
-    if (data) setNodes(data as any);
-  }, []);
+    try {
+      const res = await fetch(`${API_URL}/careers/nodes?pathId=${pathId}`);
+      if (!res.ok) throw new Error("Failed to fetch nodes");
+      const data = await res.json();
+      setNodes(data);
+    } catch (e) {
+      toast({ title: "Hata", description: "Kariyer adımları yüklenemedi", variant: "destructive" });
+    }
+  }, [toast]);
 
   // Fetch employees for dropdown
   const fetchEmployees = useCallback(async () => {
-    const { data } = await supabase.from("profiles").select("user_id, full_name");
-    if (data) setEmployees(data);
+    try {
+      const res = await fetch(`${API_URL}/users/profiles`);
+      if (!res.ok) throw new Error("Failed to fetch employees");
+      const data = await res.json();
+      setEmployees(data);
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   useEffect(() => {
@@ -412,19 +432,25 @@ export default function CareerPathEditorPage() {
   // Create new path
   const handleCreatePath = async () => {
     if (!newPathTitle || !newPathEmployeeId || !user) return;
-    const { data, error } = await supabase.from("career_paths").insert({
-      title: newPathTitle,
-      employee_user_id: newPathEmployeeId,
-      created_by: user.id,
-    } as any).select().single();
-    if (error) {
-      toast({ title: "Hata", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      const res = await fetch(`${API_URL}/careers/paths`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newPathTitle,
+          employee_user_id: newPathEmployeeId,
+          created_by: user.id,
+        })
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "Oluşturulamadı");
+      const data = await res.json();
       toast({ title: "Başarılı", description: "Kariyer yolu oluşturuldu" });
       setShowNewPath(false);
       setNewPathTitle("");
       fetchPaths();
-      if (data) setSelectedPathId((data as any).id);
+      if (data) setSelectedPathId(data.id);
+    } catch (error: any) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
     }
   };
 
@@ -432,33 +458,55 @@ export default function CareerPathEditorPage() {
   const handleAddNode = async (parentId: string | null) => {
     if (!selectedPathId || !user) return;
     const maxPriority = nodes.filter((n) => n.parent_node_id === parentId).length;
-    const { error } = await supabase.from("career_nodes").insert({
-      career_path_id: selectedPathId,
-      parent_node_id: parentId,
-      title: "Yeni Adım",
-      node_type: "skill",
-      status: "locked",
-      priority: maxPriority,
-      position_x: 0,
-      position_y: 0,
-    } as any);
-    if (!error) fetchNodes(selectedPathId);
+    try {
+      const res = await fetch(`${API_URL}/careers/nodes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          career_path_id: selectedPathId,
+          parent_node_id: parentId,
+          title: "Yeni Adım",
+          node_type: "skill",
+          status: "locked",
+          priority: maxPriority,
+          position_x: 0,
+          position_y: 0,
+        })
+      });
+      if (res.ok) fetchNodes(selectedPathId);
+      else throw new Error("Adım oluşturulamadı");
+    } catch (error: any) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    }
   };
 
   // Update node
   const handleUpdateNode = async (updated: Partial<CareerNode>) => {
     if (!selectedNode) return;
-    const { error } = await supabase.from("career_nodes").update(updated as any).eq("id", selectedNode.id);
-    if (!error && selectedPathId) {
-      fetchNodes(selectedPathId);
-      toast({ title: "Kaydedildi" });
+    try {
+      const res = await fetch(`${API_URL}/careers/nodes/${selectedNode.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated)
+      });
+      if (res.ok && selectedPathId) {
+        fetchNodes(selectedPathId);
+        toast({ title: "Kaydedildi" });
+      } else throw new Error("Kaydedilemedi");
+    } catch (error: any) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
     }
   };
 
   // Delete node
   const handleDeleteNode = async (id: string) => {
-    const { error } = await supabase.from("career_nodes").delete().eq("id", id);
-    if (!error && selectedPathId) fetchNodes(selectedPathId);
+    try {
+      const res = await fetch(`${API_URL}/careers/nodes/${id}`, { method: "DELETE" });
+      if (res.ok && selectedPathId) fetchNodes(selectedPathId);
+      else throw new Error("Silinemedi");
+    } catch (error: any) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    }
   };
 
   // Drag & drop - reparent node
@@ -471,10 +519,20 @@ export default function CareerPathEditorPage() {
     };
     if (isDescendant(dragNodeId, targetId)) return;
 
-    const { error } = await supabase.from("career_nodes").update({ parent_node_id: targetId } as any).eq("id", dragNodeId);
-    if (!error && selectedPathId) fetchNodes(selectedPathId);
-    setDragNodeId(null);
-    setDragOverId(null);
+    try {
+      const res = await fetch(`${API_URL}/careers/nodes/${dragNodeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parent_node_id: targetId })
+      });
+      if (res.ok && selectedPathId) fetchNodes(selectedPathId);
+      else throw new Error("Taşıma işlemi başarısız");
+    } catch (error: any) {
+      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    } finally {
+      setDragNodeId(null);
+      setDragOverId(null);
+    }
   };
 
   const tree = buildTree(nodes);
