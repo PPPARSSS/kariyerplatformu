@@ -64,19 +64,40 @@ const Index = () => {
     <MainLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">
-              Hoş Geldin, Ahmet! 👋
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              Bugün öğrenmeye devam edelim. Bu hafta 3 eğitim tamamladın!
-            </p>
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-card/90 to-card/40 border shadow-lg backdrop-blur-xl md:min-h-[220px] flex items-center transition-all duration-500 hover:shadow-primary/10">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent z-10" />
+
+          {/* Animated Background Elements */}
+          <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-primary/20 blur-3xl transition-transform duration-700 group-hover:scale-150 group-hover:translate-x-10" />
+          <div className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-accent/20 blur-3xl transition-transform duration-700 group-hover:scale-150 group-hover:-translate-x-10" />
+
+          {/* AI Generated Image (Nano Banana Pro) - Side Illustration */}
+          <div className="absolute right-0 top-0 h-full w-full md:w-1/2 z-0 opacity-40 md:opacity-80 saturate-150 mix-blend-overlay md:mix-blend-normal [mask-image:linear-gradient(to_right,transparent,black_40%)]">
+            <img
+              src="/home-hero.png"
+              alt="Learning & Growth"
+              className="h-full w-full object-cover transition-transform duration-1000 ease-in-out group-hover:scale-105"
+            />
           </div>
-          <Button variant="gradient" size="lg" className="shrink-0">
-            <Sparkles className="mr-2 h-5 w-5" />
-            Eğitimleri Keşfet
-          </Button>
+
+          <div className="relative z-20 flex w-full flex-col gap-6 p-8 md:p-10 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <Sparkles className="h-4 w-4" />
+                <span>Harika gidiyorsun!</span>
+              </div>
+              <h1 className="text-3xl font-extrabold text-foreground md:text-5xl tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-700">
+                Hoş Geldin, Ahmet! 👋
+              </h1>
+              <p className="mt-3 text-lg font-medium text-muted-foreground animate-in fade-in slide-in-from-bottom-6 duration-1000">
+                Bugün öğrenmeye devam edelim. Bu hafta tam <strong>3 eğitim</strong> tamamladın! Hedeflerine bir adım daha yaklaştın.
+              </p>
+            </div>
+            <Button variant="gradient" size="lg" className="shrink-0 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+              <Sparkles className="mr-2 h-5 w-5 animate-pulse" />
+              Eğitimleri Keşfet
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
