@@ -1,3 +1,247 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Infina Brand Colors */
+    --background: 340 33% 97%;
+    --foreground: 348 8% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 348 8% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 348 8% 12%;
+
+    /* Infina Red - #BA2031 */
+    --primary: 354 72% 43%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft warm gray */
+    --secondary: 340 15% 93%;
+    --secondary-foreground: 348 8% 25%;
+
+    --muted: 340 10% 94%;
+    --muted-foreground: 348 5% 45%;
+
+    /* Infina Turkuaz - #3EBEB4 */
+    --accent: 174 52% 49%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 354 72% 43%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 10% 88%;
+    --input: 340 10% 88%;
+    --ring: 354 72% 43%;
+
+    --radius: 0.75rem;
+
+    /* Infina Değer Renkleri */
+    --success: 140 70% 40%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 42 97% 54%;
+    --warning-foreground: 42 97% 15%;
+    
+    --info: 214 85% 33%;
+    --info-foreground: 0 0% 100%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(354, 72%, 43%) 0%, hsl(354, 72%, 55%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(174, 52%, 49%) 0%, hsl(174, 60%, 42%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(42, 97%, 54%) 0%, hsl(14, 88%, 58%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(348, 8%, 12%) 0%, hsl(354, 40%, 25%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(340, 33%, 98%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(348 8% 12% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(348 8% 12% / 0.08), 0 2px 4px -2px hsl(348 8% 12% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(348 8% 12% / 0.08), 0 4px 6px -4px hsl(348 8% 12% / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(348 8% 12% / 0.1), 0 8px 10px -6px hsl(348 8% 12% / 0.05);
+    --shadow-glow: 0 0 20px hsl(354 72% 43% / 0.3);
+
+    /* Sidebar - Infina Koyu Gri #414042 */
+    --sidebar-background: 300 1% 25%;
+    --sidebar-foreground: 340 10% 88%;
+    --sidebar-primary: 354 72% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 300 1% 32%;
+    --sidebar-accent-foreground: 340 10% 92%;
+    --sidebar-border: 300 1% 30%;
+    --sidebar-ring: 354 72% 50%;
+  }
+
+  .dark {
+    --background: 300 2% 10%;
+    --foreground: 340 10% 92%;
+
+    --card: 300 2% 14%;
+    --card-foreground: 340 10% 92%;
+
+    --popover: 300 2% 14%;
+    --popover-foreground: 340 10% 92%;
+
+    --primary: 354 72% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 300 2% 20%;
+    --secondary-foreground: 340 10% 85%;
+
+    --muted: 300 2% 18%;
+    --muted-foreground: 340 5% 55%;
+
+    --accent: 174 52% 49%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 354 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 300 2% 22%;
+    --input: 300 2% 22%;
+    --ring: 354 72% 50%;
+
+    --sidebar-background: 300 2% 8%;
+    --sidebar-foreground: 340 10% 85%;
+    --sidebar-primary: 354 72% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 300 2% 15%;
+    --sidebar-accent-foreground: 340 10% 90%;
+    --sidebar-border: 300 2% 18%;
+    --sidebar-ring: 354 72% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+    box-shadow: var(--shadow-md);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+}

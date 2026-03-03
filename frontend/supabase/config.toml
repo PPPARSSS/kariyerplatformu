@@ -1,0 +1,4 @@
+project_id = "tpmxrzcslxbfujgopcrv"
+
+[functions.procedure-chat]
+verify_jwt = false
